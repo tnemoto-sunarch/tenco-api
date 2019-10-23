@@ -48,15 +48,29 @@ public class TencoApiService {
 		return authRepo.findByAuthIdAndAuthPassAndDelFlg(authId, authPass, 0);
 	}
 
-	public void registUser(String userId) {
-		MUser user = new MUser();
-		user.setUserNo(userRepo.findByMaxUserNo().intValue());
-		user.setUserId(userId);
-		user.setUserName(null);
-		user.setUserType("00");
-		user.setDelFlg(0);
-		user.setCreateUserId(userId);
-		user.setLastUpdateUserId(userId);
+	public void registUser(String userId, String authType) {
+		MUser user = searchUser(userId);
+		if(user != null) {
+			logger.info("user already exists. user info updating.");
+			user.setUserType(authType);
+			user.setDelFlg(0);
+			user.setLastUpdateUserId(userId);
+		} else {
+			logger.info("user not exists. user info creating.");
+			user = new MUser();
+			Number mno = userRepo.findByMaxUserNo();
+			if(mno != null) {
+				user.setUserNo(mno.intValue());
+			} else {
+				user.setUserNo(1);
+			}
+			user.setUserId(userId);
+			user.setUserName(null);
+			user.setUserType(authType);
+			user.setDelFlg(0);
+			user.setCreateUserId(userId);
+			user.setLastUpdateUserId(userId);
+		}
 
 		userRepo.save(user);
 	}
@@ -85,7 +99,7 @@ public class TencoApiService {
 		List<TCheckListResult> resultList = resultRepo.findByCheckListNoAndDelFlgOrderByResultNo(checklist.getCheckListNo(), 0);
 
 		if(resultList.size() == 0) {
-			List<MCheckTarget> targetList = targetRepo.findByDelFlgOrderByTargetId(0);
+			List<MCheckTarget> targetList = targetRepo.findByDelFlgOrderBySort(0);
 
 			logger.info("-- target: " + targetList.size());
 
@@ -94,7 +108,7 @@ public class TencoApiService {
 			for(MCheckTarget t : targetList) {
 				TCheckListResult data = new TCheckListResult();
 				data.setCheckListNo(checklist.getCheckListNo());
-				data.setResultNo(t.getTargetId());
+				data.setResultNo(t.getSort());
 				data.setName(t.getTargetName());
 				data.setStatus(false);
 
@@ -185,6 +199,7 @@ public class TencoApiService {
 		checklist.setCheckListType(checkListType);
 		checklist.setCheckListDefaultType(checkListType);
 		checklist.setStatus("00");
+		checklist.setDelFlg(0);
 		checklist.setCreateUserId(userId);
 		checklist.setLastUpdateUserId(userId);
 
@@ -201,6 +216,53 @@ public class TencoApiService {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public boolean isAdmin(MAuth auth) {
+		if(auth.getAuthType().equals("10")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public List<MCheckTarget> searchCheckTarget() {
+		return targetRepo.findByDelFlgOrderBySort(0);
+	}
+
+	public MCheckTarget searchCheckTarget(int targetId) {
+		return targetRepo.findByTargetId(targetId);
+	}
+
+	public void updateCheckTarget(int targetId, String name, int sort, String userId) {
+		MCheckTarget target = searchCheckTarget(targetId);
+
+		if(target != null) {
+			target.setTargetName(name);
+			target.setSort(sort);
+			target.setLastUpdateUserId(userId);
+		} else {
+			target = new MCheckTarget();
+			target.setTargetId(targetId);
+			target.setTargetName(name);
+			target.setSort(sort);
+			target.setDelFlg(0);
+			target.setCreateUserId(userId);
+			target.setLastUpdateUserId(userId);
+		}
+
+		targetRepo.save(target);
+	}
+
+	public void deleteCheckTarget(int targetId, String userId) {
+		MCheckTarget target = searchCheckTarget(targetId);
+
+		if(target != null) {
+			logger.info("target data deleted.[" + targetId + "]");
+			targetRepo.delete(target);
+		} else {
+			logger.info("not exists data");
 		}
 	}
 }

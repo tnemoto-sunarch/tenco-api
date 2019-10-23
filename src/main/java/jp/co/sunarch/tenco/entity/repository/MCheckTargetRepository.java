@@ -10,6 +10,7 @@ import jp.co.sunarch.tenco.entity.MCheckTargetPrimaryKey;
 
 public interface MCheckTargetRepository extends JpaRepository<MCheckTarget, MCheckTargetPrimaryKey>{
 
-	public List<MCheckTarget> findByDelFlgOrderByTargetId(@Param("del_flg") int delFlg);
+	public MCheckTarget findByTargetId(@Param("target_id") int targetId);
 
+	public List<MCheckTarget> findByDelFlgOrderBySort(@Param("del_flg") int delFlg);
 }

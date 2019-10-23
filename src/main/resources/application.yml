@@ -3,9 +3,10 @@ spring:
     name: tencoApi
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:tencoapi;DB_CLOSE_ON_EXIT=TRUE;MODE=MySQL
+    url: jdbc:h2:mem:tenco;DB_CLOSE_ON_EXIT=TRUE;MODE=MySQL
     username: sa
     password:
+    initialization-mode: embedded # always / embedded / never
   h2:
     console:
       enabled: true

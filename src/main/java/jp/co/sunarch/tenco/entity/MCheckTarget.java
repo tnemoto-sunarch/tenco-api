@@ -17,9 +17,12 @@ public class MCheckTarget extends AbstractEntity{
 	@Column(name="target_id", nullable = false)
 	private int targetId = -1;
 
-	@Column(name="target_name", nullable = false)
+	@Column(name="target_name", nullable = true)
 	@Size(max = 255)
 	private String targetName = null;
+
+	@Column(name="sort", nullable = false)
+	private int sort = -1;
 
 	public int getTargetId() {
 		return targetId;
@@ -35,6 +38,14 @@ public class MCheckTarget extends AbstractEntity{
 
 	public void setTargetName(String targetName) {
 		this.targetName = targetName;
+	}
+
+	public int getSort() {
+		return sort;
+	}
+
+	public void setSort(int sort) {
+		this.sort = sort;
 	}
 
 }

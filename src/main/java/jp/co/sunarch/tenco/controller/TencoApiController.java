@@ -23,8 +23,10 @@ import jp.co.sunarch.tenco.dto.JsonResponseAuthInfo;
 import jp.co.sunarch.tenco.dto.JsonResponseCheckList;
 import jp.co.sunarch.tenco.dto.JsonResponseCheckListDetail;
 import jp.co.sunarch.tenco.dto.JsonResponseCheckListResult;
+import jp.co.sunarch.tenco.dto.JsonResponseTargetList;
 import jp.co.sunarch.tenco.dto.JsonResponseUserInfo;
 import jp.co.sunarch.tenco.entity.MAuth;
+import jp.co.sunarch.tenco.entity.MCheckTarget;
 import jp.co.sunarch.tenco.entity.MUser;
 import jp.co.sunarch.tenco.entity.TCheckList;
 import jp.co.sunarch.tenco.entity.TCheckListResult;
@@ -66,12 +68,13 @@ public class TencoApiController {
 			if(auth != null) {
 				res.setAuthInfo(new JsonResponseAuthInfo());
 				res.getAuthInfo().setLogin(true);
-				res.getAuthInfo().setType(auth.getAuthType());
+				res.getAuthInfo().setAdmin(service.isAdmin(auth));;
 
-				service.registUser(req.getUserId());
+				service.registUser(req.getUserId(), auth.getAuthType());
 			} else {
 				res.setAuthInfo(new JsonResponseAuthInfo());
 				res.getAuthInfo().setLogin(false);
+				res.getAuthInfo().setAdmin(false);
 
 				logger.info("-- Non-Authoritative Information.");
 			}
@@ -330,7 +333,7 @@ public class TencoApiController {
 				logger.info("-- admin. process continue.");
 				service.resetCheckList(checkListId);
 			} else {
-				logger.info("-- not admin. process skip.");
+				logger.warn("-- not admin. process skip.");
 			}
 
 			res.setResultCode(0);
@@ -357,7 +360,110 @@ public class TencoApiController {
 				logger.info("-- admin. process continue.");
 				service.openCheckList(checkListId);
 			} else {
-				logger.info("-- not admin. process skip.");
+				logger.warn("-- not admin. process skip.");
+			}
+
+			res.setResultCode(0);
+			res.setMessage("success");
+		} catch(Exception e) {
+			logger.error(e.getMessage(), e);
+			res.setResultCode(999);
+			res.setMessage(e.getMessage());
+		}
+
+		res.setProccess(new Date());
+		return ResponseEntity.ok(res);
+	}
+
+	@RequestMapping(value = "targetlist/list", method = RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JsonResponse> targetlist(@RequestBody JsonRequest req) {
+		JsonResponse res = new JsonResponse();
+		try {
+			logger.info("★★ uid=" + req.getUserId() + ", rid=" + req.getRequestId());
+
+			boolean isAdmin = service.isAdmin(req.getUserId());
+
+			if(isAdmin) {
+				logger.info("-- admin. process continue.");
+
+				List<MCheckTarget> targetList = service.searchCheckTarget();
+
+				res.setTargetList(new ArrayList<JsonResponseTargetList>());
+				for(MCheckTarget t : targetList) {
+					JsonResponseTargetList data = new JsonResponseTargetList();
+					data.setId(t.getTargetId());
+					data.setName(t.getTargetName());
+					data.setSort(t.getSort());
+					res.getTargetList().add(data);
+				}
+
+			} else {
+				res.setTargetList(new ArrayList<JsonResponseTargetList>());
+				logger.warn("-- not admin. process skip.");
+			}
+
+			res.setResultCode(0);
+			res.setMessage("success");
+		} catch(Exception e) {
+			logger.error(e.getMessage(), e);
+			res.setResultCode(999);
+			res.setMessage(e.getMessage());
+		}
+
+		res.setProccess(new Date());
+		return ResponseEntity.ok(res);
+	}
+
+	@RequestMapping(value = "targetlist/update", method = RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JsonResponse> updateCheckTarget(@RequestBody JsonRequest req) {
+		JsonResponse res = new JsonResponse();
+		try {
+			logger.info("★★ uid=" + req.getUserId() + ", rid=" + req.getRequestId());
+
+			boolean isAdmin = service.isAdmin(req.getUserId());
+
+			if(isAdmin) {
+				logger.info("-- admin. process continue.");
+
+				service.updateCheckTarget(
+						req.getUpdateCheckTarget().getId(),
+						req.getUpdateCheckTarget().getName(),
+						req.getUpdateCheckTarget().getSort(),
+						req.getUserId());
+
+			} else {
+				logger.warn("-- not admin. process skip.");
+			}
+
+			res.setResultCode(0);
+			res.setMessage("success");
+		} catch(Exception e) {
+			logger.error(e.getMessage(), e);
+			res.setResultCode(999);
+			res.setMessage(e.getMessage());
+		}
+
+		res.setProccess(new Date());
+		return ResponseEntity.ok(res);
+	}
+
+	@RequestMapping(value = "targetlist/delete", method = RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JsonResponse> deleteCheckTarget(@RequestBody JsonRequest req) {
+		JsonResponse res = new JsonResponse();
+		try {
+			logger.info("★★ uid=" + req.getUserId() + ", rid=" + req.getRequestId());
+
+			boolean isAdmin = service.isAdmin(req.getUserId());
+
+			if(isAdmin) {
+				logger.info("-- admin. process continue.");
+
+				service.deleteCheckTarget(
+						req.getUpdateCheckTarget().getId(),
+						req.getUserId());
+
+			} else {
+				logger.warn("-- not admin. process skip.");
 			}
 
 			res.setResultCode(0);

@@ -33,3 +33,5 @@ build/
 ### custom ###
 /src/main/resources/data.sql
 logs/
+/src/main/resources/application-production.yml
+/db/

@@ -36,6 +36,10 @@ public class JsonResponse implements Serializable{
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private JsonResponseAuthInfo authInfo = null;
 
+	@JsonProperty("target_list")
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private List<JsonResponseTargetList> targetList = null;
+
 	public int getResultCode() {
 		return resultCode;
 	}
@@ -90,6 +94,14 @@ public class JsonResponse implements Serializable{
 
 	public void setAuthInfo(JsonResponseAuthInfo authInfo) {
 		this.authInfo = authInfo;
+	}
+
+	public List<JsonResponseTargetList> getTargetList() {
+		return targetList;
+	}
+
+	public void setTargetList(List<JsonResponseTargetList> targetList) {
+		this.targetList = targetList;
 	}
 
 }

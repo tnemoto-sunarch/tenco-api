@@ -24,6 +24,10 @@ public class JsonRequest implements Serializable{
 	@JsonProperty("add_check_list")
 	private JsonRequestAddCheckList addCheckList = null;
 
+	@JsonProperty("update_check_target")
+	private JsonRequestUpdateCheckTarget updateCheckTarget = null;
+
+
 	public String getUserId() {
 		return userId;
 	}
@@ -70,6 +74,14 @@ public class JsonRequest implements Serializable{
 
 	public void setAddCheckList(JsonRequestAddCheckList addCheckList) {
 		this.addCheckList = addCheckList;
+	}
+
+	public JsonRequestUpdateCheckTarget getUpdateCheckTarget() {
+		return updateCheckTarget;
+	}
+
+	public void setUpdateCheckTarget(JsonRequestUpdateCheckTarget updateCheckTarget) {
+		this.updateCheckTarget = updateCheckTarget;
 	}
 
 }

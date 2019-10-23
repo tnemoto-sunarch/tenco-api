@@ -7,8 +7,8 @@ public class JsonResponseAuthInfo {
 	@JsonProperty("login")
 	private boolean login = false;
 
-	@JsonProperty("type")
-	private String type = null;
+	@JsonProperty("admin")
+	private boolean admin = false;
 
 	public boolean isLogin() {
 		return login;
@@ -18,12 +18,12 @@ public class JsonResponseAuthInfo {
 		this.login = login;
 	}
 
-	public String getType() {
-		return type;
+	public boolean isAdmin() {
+		return admin;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
 	}
 
 }
